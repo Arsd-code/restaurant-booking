@@ -87,7 +87,7 @@
                     {% for dish in dishes %}
                     <div class="glass dark:glass-dark rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                          :class="form.dish_id === '{{ dish.id }}' ? 'ring-2 ring-blue-500/50 bg-blue-50/50 dark:bg-blue-900/20' : ''"
-                         @click="selectDish({{ dish|tojson }})">
+                         @click="selectDish({{ dish|tojson|safe }})">
                         
                         <!-- Dish Header -->
                         <div class="flex items-center justify-between mb-3">

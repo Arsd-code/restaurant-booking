@@ -90,8 +90,8 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" x-data="{ 
-            dishes: {{ dishes|tojson }},
-            bookings: {{ today_bookings|tojson }},
+            dishes: {{ dishes|tojson|safe }},
+            bookings: {{ today_bookings|tojson|safe }},
             
             getDishBookings(dishId) {
                 return this.bookings.filter(booking => booking.dish_id === dishId).length;
@@ -210,17 +210,17 @@
                         <i data-lucide="user" class="w-5 h-5 text-white"></i>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ booking.customer_name }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.customer_phone }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ booking['customer_name'] }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking['customer_phone'] }}</p>
                     </div>
                 </div>
                 <div class="text-right">
                     <p class="font-semibold text-gray-900 dark:text-white">
                         {% for dish in dishes %}
-                            {% if dish.id == booking.dish_id %}{{ dish.name }}{% endif %}
+                            {% if dish['id'] == booking['dish_id'] %}{{ dish['name'] }}{% endif %}
                         {% endfor %}
                     </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.booking_time.strftime('%I:%M %p') }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking['booking_time'].strftime('%I:%M %p') }}</p>
                 </div>
             </div>
             {% endfor %}
