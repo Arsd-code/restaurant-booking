@@ -206,6 +206,10 @@ def admin_dashboard():
         'dish_stats': dish_stats
     }
     
+    # Additional calculations for modern dashboard
+    total_stock = sum(dish['available_quantity'] for dish in dishes)
+    low_stock_count = sum(1 for dish in dishes if dish['available_quantity'] <= 5)
+    
     return render_template('admin_dashboard.html', stats=stats)
 
 @app.route('/admin/booking')
