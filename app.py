@@ -544,10 +544,14 @@ def admin_stock_calendar():
             'dishes': current_dishes
         }
     
+    # Get today's date for template comparisons
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    
     return render_template('admin_stock_calendar.html', 
                          selected_date=selected_date,
                          date_stock=date_stock,
-                         stock_history=stock_history)
+                         stock_history=stock_history,
+                         today_date=today_date)
 
 @app.route('/admin/update-stock-date', methods=['POST'])
 @admin_required

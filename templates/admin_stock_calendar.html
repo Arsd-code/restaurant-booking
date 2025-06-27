@@ -125,7 +125,7 @@
                                     Update Stock for {{ selected_date }}
                                 </button>
                                 
-                                {% if selected_date == datetime.now().strftime('%Y-%m-%d') %}
+                                {% if selected_date == today_date %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary" onclick="resetToDefault()">
                                         <i class="fas fa-undo me-2"></i>
@@ -173,7 +173,7 @@
                             <tr {% if entry.date == selected_date %}class="table-active"{% endif %}>
                                 <td>
                                     <strong>{{ entry.date }}</strong>
-                                    {% if entry.date == datetime.now().strftime('%Y-%m-%d') %}
+                                    {% if entry.date == today_date %}
                                     <span class="badge bg-primary ms-1">Today</span>
                                     {% endif %}
                                 </td>
@@ -257,7 +257,7 @@ function setAllZero() {
 // Update date badge based on selected date
 document.addEventListener('DOMContentLoaded', function() {
     const selectedDate = '{{ selected_date }}';
-    const today = getTodayDate();
+    const today = '{{ today_date }}';
     const badge = document.getElementById('date-badge');
     
     if (selectedDate === today) {
