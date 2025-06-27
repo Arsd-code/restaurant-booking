@@ -1,264 +1,281 @@
 {% extends "base_modern.html" %}
 
-{% block title %}Dashboard - Mandi Restaurant Admin{% endblock %}
+{% block title %}Dashboard - Mandi Restaurant{% endblock %}
+
+{% block header %}Dashboard{% endblock %}
+{% block subtitle %}Overview of your restaurant operations{% endblock %}
 
 {% block content %}
-<div x-data="dashboardData()" class="space-y-8">
-    <!-- Welcome Header -->
-    <div class="animate-fade-in">
-        <div class="glass dark:glass-dark rounded-3xl p-8 text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
+<div class="space-y-6 animate-fade-in">
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Today's Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 group">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold mb-2">Welcome back, Admin!</h1>
-                    <p class="text-white/80">Here's what's happening at your Mandi restaurant today.</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Revenue</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ stats.daily_revenue }}</p>
+                    <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                        <i data-lucide="trending-up" class="w-3 h-3 inline mr-1"></i>
+                        +12% from yesterday
+                    </p>
                 </div>
-                <div class="hidden md:block">
-                    <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-lg">
-                        <i data-lucide="chef-hat" class="w-10 h-10 text-white"></i>
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i data-lucide="currency-symbol" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Orders -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Orders</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.daily_bookings }}</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                        <i data-lucide="shopping-bag" class="w-3 h-3 inline mr-1"></i>
+                        {{ stats.total_bookings }} total orders
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Dishes -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Dishes</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.total_dishes }}</p>
+                    <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                        <i data-lucide="chef-hat" class="w-3 h-3 inline mr-1"></i>
+                        {{ stats.low_stock_dishes }} need restocking
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i data-lucide="utensils" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Revenue</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ stats.monthly_revenue }}</p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                        <i data-lucide="calendar" class="w-3 h-3 inline mr-1"></i>
+                        This month
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dish Status Cards -->
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Dish Status</h2>
+            <div class="flex space-x-2">
+                <button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">All</button>
+                <button class="px-4 py-2 text-sm font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors">Low Stock</button>
+                <button class="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">Out of Stock</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" x-data="{ 
+            dishes: {{ dishes|tojson }},
+            bookings: {{ today_bookings|tojson }},
+            
+            getDishBookings(dishId) {
+                return this.bookings.filter(booking => booking.dish_id === dishId).length;
+            },
+            
+            getDishRevenue(dishId) {
+                const dishBookings = this.bookings.filter(booking => booking.dish_id === dishId);
+                const dish = this.dishes.find(d => d.id === dishId);
+                return dishBookings.length * (dish?.price || 0);
+            },
+            
+            getRemainingQty(dish) {
+                const booked = this.getDishBookings(dish.id);
+                return Math.max(0, dish.available_quantity - booked);
+            },
+            
+            getStockStatus(dish) {
+                const remaining = this.getRemainingQty(dish);
+                if (remaining === 0) return 'out';
+                if (remaining <= 5) return 'low';
+                return 'good';
+            }
+        }">
+            <template x-for="dish in dishes" :key="dish.id">
+                <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 animate-scale-in">
+                    <!-- Dish Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white" x-text="dish.name"></h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                  :class="{
+                                      'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400': getStockStatus(dish) === 'out',
+                                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400': getStockStatus(dish) === 'low',
+                                      'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400': getStockStatus(dish) === 'good'
+                                  }"
+                                  x-text="getStockStatus(dish) === 'out' ? 'Out of Stock' : 
+                                         getStockStatus(dish) === 'low' ? 'Low Stock' : 'In Stock'">
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Dish Stats Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Available</p>
+                            <p class="text-xl font-bold text-gray-900 dark:text-white" x-text="dish.available_quantity"></p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Booked Today</p>
+                            <p class="text-xl font-bold text-blue-600 dark:text-blue-400" x-text="getDishBookings(dish.id)"></p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Remaining</p>
+                            <p class="text-xl font-bold text-green-600 dark:text-green-400" x-text="getRemainingQty(dish)"></p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Revenue</p>
+                            <p class="text-xl font-bold text-purple-600 dark:text-purple-400">₹<span x-text="getDishRevenue(dish.id)"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Stock Progress Bar -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
+                            <span>Stock Level</span>
+                            <span x-text="getRemainingQty(dish) + '/' + dish.available_quantity"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="h-2 rounded-full transition-all duration-500"
+                                 :class="{
+                                     'bg-red-500': getStockStatus(dish) === 'out',
+                                     'bg-yellow-500': getStockStatus(dish) === 'low',
+                                     'bg-green-500': getStockStatus(dish) === 'good'
+                                 }"
+                                 :style="'width: ' + Math.max(5, (getRemainingQty(dish) / dish.available_quantity) * 100) + '%'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price & Actions -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Price</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">₹<span x-text="dish.price"></span></p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="p-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/30 transition-colors"
+                                    title="Quick Book">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                            <button class="p-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                    title="Edit Dish">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
         </div>
     </div>
-    
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Today's Revenue -->
-        <div class="glass dark:glass-dark rounded-3xl p-6 hover:scale-105 transition-all duration-300 animate-slide-up group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i data-lucide="indian-rupee" class="w-6 h-6 text-green-500"></i>
-                </div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
-                    Today
-                </span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">₹{{ "%.0f"|format(today_revenue) }}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Revenue earned</p>
-            <div class="mt-3 flex items-center">
-                <div class="flex items-center text-sm text-green-600 dark:text-green-400">
-                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i>
-                    <span>+12.5%</span>
-                </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">vs yesterday</span>
-            </div>
+
+    <!-- Recent Activity -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h2>
+            <a href="/admin/bookings" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                View All →
+            </a>
         </div>
-        
-        <!-- Today's Bookings -->
-        <div class="glass dark:glass-dark rounded-3xl p-6 hover:scale-105 transition-all duration-300 animate-slide-up group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i data-lucide="calendar-check" class="w-6 h-6 text-blue-500"></i>
-                </div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">
-                    Today
-                </span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ today_bookings_count }}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Orders placed</p>
-            <div class="mt-3 flex items-center">
-                <div class="flex items-center text-sm text-blue-600 dark:text-blue-400">
-                    <i data-lucide="users" class="w-4 h-4 mr-1"></i>
-                    <span>{{ today_bookings_count }} customers</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Total Dishes -->
-        <div class="glass dark:glass-dark rounded-3xl p-6 hover:scale-105 transition-all duration-300 animate-slide-up group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i data-lucide="chef-hat" class="w-6 h-6 text-orange-500"></i>
-                </div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full">
-                    Menu
-                </span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ dishes|length }}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Dishes available</p>
-            <div class="mt-3 flex items-center">
-                <div class="flex items-center text-sm text-orange-600 dark:text-orange-400">
-                    <i data-lucide="package" class="w-4 h-4 mr-1"></i>
-                    <span>{{ total_stock }} items</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Low Stock Alert -->
-        <div class="glass dark:glass-dark rounded-3xl p-6 hover:scale-105 transition-all duration-300 animate-slide-up group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>
-                </div>
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded-full">
-                    Alert
-                </span>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ low_stock_count }}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Low stock items</p>
-            <div class="mt-3 flex items-center">
-                <div class="flex items-center text-sm text-red-600 dark:text-red-400">
-                    <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i>
-                    <span>Needs attention</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Dish Status Cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {% for dish in dishes %}
-        <div class="glass dark:glass-dark rounded-3xl p-6 hover:scale-105 transition-all duration-300 animate-slide-up group">
-            <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center">
-                        <i data-lucide="utensils" class="w-6 h-6 text-white"></i>
+
+        <div class="space-y-4">
+            {% for booking in today_bookings[:5] %}
+            <div class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <i data-lucide="user" class="w-5 h-5 text-white"></i>
                     </div>
                     <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ dish.dish_name }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">₹{{ "%.0f"|format(dish.price) }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ booking.customer_name }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.customer_phone }}</p>
                     </div>
                 </div>
                 <div class="text-right">
-                    {% if dish.available_quantity > 20 %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                        <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>
-                        In Stock
-                    </span>
-                    {% elif dish.available_quantity > 5 %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                        <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i>
-                        Low Stock
-                    </span>
-                    {% elif dish.available_quantity > 0 %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                        <i data-lucide="alert-circle" class="w-3 h-3 mr-1"></i>
-                        Very Low
-                    </span>
-                    {% else %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
-                        <i data-lucide="x-circle" class="w-3 h-3 mr-1"></i>
-                        Out of Stock
-                    </span>
-                    {% endif %}
+                    <p class="font-semibold text-gray-900 dark:text-white">
+                        {% for dish in dishes %}
+                            {% if dish.id == booking.dish_id %}{{ dish.name }}{% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.booking_time.strftime('%I:%M %p') }}</p>
                 </div>
             </div>
-            
-            <!-- Progress Bars -->
-            <div class="space-y-3">
-                <div>
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-600 dark:text-gray-400">Available</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ dish.available_quantity }}</span>
-                    </div>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        {% set max_quantity = 50 %}
-                        {% set percentage = (dish.available_quantity / max_quantity * 100) if max_quantity > 0 else 0 %}
-                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-300" 
-                             style="width: {{ [percentage, 100]|min }}%"></div>
-                    </div>
-                </div>
-                
-                {% set today_dish_bookings = today_bookings|selectattr('dish_booked', 'equalto', dish.dish_name)|list %}
-                {% set booked_qty = today_dish_bookings|sum(attribute='quantity', start=0) or 0 %}
-                {% set revenue_earned = today_dish_bookings|sum(attribute='total_price', start=0) or 0 %}
-                
-                <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-600 dark:text-gray-400">Today's Orders</span>
-                        <span class="font-medium text-blue-600 dark:text-blue-400">{{ booked_qty }}</span>
-                    </div>
-                    <div class="flex justify-between text-sm mt-1">
-                        <span class="text-gray-600 dark:text-gray-400">Revenue</span>
-                        <span class="font-medium text-green-600 dark:text-green-400">₹{{ "%.0f"|format(revenue_earned) }}</span>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-    
+
     <!-- Quick Actions -->
-    <div class="glass dark:glass-dark rounded-3xl p-8">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-            <i data-lucide="zap" class="w-6 h-6 mr-3 text-yellow-500"></i>
-            Quick Actions
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ url_for('admin_booking') }}" 
-               class="group p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">New Booking</h3>
-                        <p class="text-xs text-white/80">Take phone order</p>
-                    </div>
-                </div>
-            </a>
-            
-            <a href="{{ url_for('admin_dishes') }}" 
-               class="group p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="chef-hat" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">Manage Dishes</h3>
-                        <p class="text-xs text-white/80">Edit menu items</p>
-                    </div>
-                </div>
-            </a>
-            
-            <a href="{{ url_for('admin_stock_calendar') }}" 
-               class="group p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">Stock Calendar</h3>
-                        <p class="text-xs text-white/80">Update inventory</p>
-                    </div>
-                </div>
-            </a>
-            
-            <a href="{{ url_for('admin_revenue') }}" 
-               class="group p-4 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="trending-up" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">View Reports</h3>
-                        <p class="text-xs text-white/80">Analytics & revenue</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/admin/booking" class="group glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <i data-lucide="plus" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">New Booking</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Add customer order</p>
+        </a>
+
+        <a href="/admin/dishes" class="group glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <i data-lucide="chef-hat" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Manage Dishes</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Edit menu items</p>
+        </a>
+
+        <a href="/admin/stock-calendar" class="group glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <i data-lucide="calendar-days" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Stock Calendar</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Manage inventory</p>
+        </a>
+
+        <a href="/admin/revenue" class="group glass dark:glass-dark rounded-2xl p-6 hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Revenue Report</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">View analytics</p>
+        </a>
     </div>
 </div>
 
 <script>
-function dashboardData() {
-    return {
-        init() {
-            // Initialize any dashboard-specific functionality
-            setInterval(() => {
-                // Real-time updates could be implemented here
-                this.updateTime();
-            }, 60000);
-        },
-        updateTime() {
-            // Update timestamp displays
-            const timeElements = document.querySelectorAll('[data-time]');
-            timeElements.forEach(el => {
-                el.textContent = new Date().toLocaleTimeString();
-            });
-        }
+    // Real-time updates simulation
+    function updateDashboard() {
+        // This would normally fetch real-time data
+        console.log('Dashboard updated at', new Date());
     }
-}
+
+    // Update every 30 seconds
+    setInterval(updateDashboard, 30000);
+
+    // Initialize icons
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
 </script>
 {% endblock %}

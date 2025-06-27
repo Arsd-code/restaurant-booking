@@ -133,7 +133,7 @@ def index():
 @app.route('/admin/login')
 def admin_login():
     """Admin login page"""
-    return render_template('admin_login.html')
+    return render_template('admin_login_modern.html')
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login_post():
@@ -210,7 +210,14 @@ def admin_dashboard():
     total_stock = sum(dish['available_quantity'] for dish in dishes)
     low_stock_count = sum(1 for dish in dishes if dish['available_quantity'] <= 5)
     
-    return render_template('admin_dashboard.html', stats=stats)
+    return render_template('admin_dashboard_modern.html', 
+                         dishes=dishes,
+                         today_bookings=today_bookings,
+                         today_bookings_count=len(today_bookings),
+                         today_revenue=daily_revenue,
+                         total_stock=total_stock,
+                         low_stock_count=low_stock_count,
+                         stats=stats)
 
 @app.route('/admin/booking')
 @admin_required
@@ -219,7 +226,7 @@ def admin_booking():
     dishes = load_dishes()
     # Filter only available dishes
     available_dishes = [dish for dish in dishes if dish['available_quantity'] > 0]
-    return render_template('admin_booking.html', dishes=available_dishes)
+    return render_template('admin_booking_modern.html', dishes=available_dishes)
 
 @app.route('/admin/booking', methods=['POST'])
 @admin_required

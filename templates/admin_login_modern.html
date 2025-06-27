@@ -2,147 +2,138 @@
 
 {% block title %}Admin Login - Mandi Restaurant{% endblock %}
 
-{% block content %}
-<div class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTkwIiBoZWlnaHQ9IjU5MCIgdmlld0JveD0iMCAwIDU5MCA1OTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48ZyBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiPjxjaXJjbGUgY3g9IjI5NSIgY3k9IjI5NSIgcj0iMjk1Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
+{% block login_content %}
+<div class="w-full max-w-md animate-fade-in">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-2xl animate-pulse-gentle"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-2xl animate-pulse-gentle" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 right-1/3 w-24 h-24 bg-gradient-to-br from-green-400/20 to-teal-400/20 rounded-full blur-2xl animate-pulse-gentle" style="animation-delay: 2s;"></div>
+    </div>
     
-    <div class="relative w-full max-w-md">
-        <!-- Login Card -->
-        <div class="glass rounded-3xl p-8 backdrop-blur-xl shadow-2xl border border-white/20 animate-scale-in">
+    <!-- Login Card -->
+    <div class="glass dark:glass-dark rounded-3xl p-8 shadow-2xl animate-scale-in relative overflow-hidden">
+        <!-- Gradient Border Effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-orange-500/20 rounded-3xl blur-sm opacity-50"></div>
+        
+        <div class="relative z-10">
             <!-- Logo Section -->
             <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div class="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <i data-lucide="utensils" class="w-10 h-10 text-white"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-white mb-2">Mandi Restaurant</h1>
-                <p class="text-white/70">Admin Access Portal</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h1>
+                <p class="text-gray-600 dark:text-gray-400">Sign in to manage your restaurant</p>
             </div>
             
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-6 p-4 bg-red-100/80 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl animate-slide-down">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>
+                                <p class="text-red-700 dark:text-red-400 text-sm font-medium">{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             <!-- Login Form -->
-            <form method="POST" action="{{ url_for('admin_login_post') }}" x-data="{ loading: false }" @submit="loading = true" class="space-y-6">
-                <div>
-                    <label for="email" class="block text-sm font-medium text-white mb-2">
-                        <i data-lucide="mail" class="w-4 h-4 inline mr-2"></i>
-                        Email Address
-                    </label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           required 
-                           value="admin@restaurant.com"
-                           class="w-full px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
-                           placeholder="Enter your email">
-                </div>
-                
-                <div>
-                    <label for="password" class="block text-sm font-medium text-white mb-2">
-                        <i data-lucide="lock" class="w-4 h-4 inline mr-2"></i>
-                        Password
-                    </label>
-                    <div class="relative" x-data="{ showPassword: false }">
-                        <input :type="showPassword ? 'text' : 'password'" 
-                               id="password" 
-                               name="password" 
-                               required 
-                               value="admin123"
-                               class="w-full px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm pr-12"
-                               placeholder="Enter your password">
-                        <button type="button" 
-                                @click="showPassword = !showPassword"
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors">
-                            <i :data-lucide="showPassword ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
-                        </button>
+            <form method="POST" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
+                <div class="space-y-4">
+                    <!-- Email Field -->
+                    <div class="group">
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Email Address
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="mail" class="w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
+                            </div>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   required
+                                   value="admin@restaurant.com"
+                                   class="w-full pl-12 pr-4 py-4 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all duration-200 backdrop-blur-sm"
+                                   placeholder="Enter your email">
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="group" x-data="{ showPassword: false }">
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Password
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i data-lucide="lock" class="w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
+                            </div>
+                            <input :type="showPassword ? 'text' : 'password'" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   value="admin123"
+                                   class="w-full pl-12 pr-12 py-4 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all duration-200 backdrop-blur-sm"
+                                   placeholder="Enter your password">
+                            <button type="button" 
+                                    @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                                <i data-lucide="eye" x-show="!showPassword" class="w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"></i>
+                                <i data-lucide="eye-off" x-show="showPassword" class="w-5 h-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Login Button -->
                 <button type="submit" 
                         :disabled="loading"
-                        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group">
-                    <span x-show="!loading" class="flex items-center justify-center">
-                        <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
-                        Sign In to Dashboard
+                        class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl disabled:shadow-none transform hover:scale-[1.02] disabled:scale-100 transition-all duration-200 flex items-center justify-center space-x-2">
+                    <span x-show="!loading">Sign In</span>
+                    <span x-show="loading" class="flex items-center space-x-2">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Signing in...</span>
                     </span>
-                    <span x-show="loading" class="flex items-center justify-center">
-                        <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                        Signing in...
-                    </span>
-                    
-                    <!-- Button hover effect -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 </button>
             </form>
             
             <!-- Demo Credentials -->
-            <div class="mt-8 p-4 rounded-2xl bg-white/5 border border-white/10">
-                <h3 class="text-sm font-semibold text-white mb-2 flex items-center">
-                    <i data-lucide="info" class="w-4 h-4 mr-2"></i>
-                    Demo Credentials
-                </h3>
-                <div class="space-y-1 text-sm text-white/70">
-                    <p><span class="font-medium">Email:</span> admin@restaurant.com</p>
-                    <p><span class="font-medium">Password:</span> admin123</p>
-                </div>
-            </div>
-            
-            <!-- Features List -->
-            <div class="mt-8">
-                <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
-                    <i data-lucide="star" class="w-4 h-4 mr-2"></i>
-                    Admin Features
-                </h3>
-                <div class="grid grid-cols-2 gap-3 text-xs text-white/70">
-                    <div class="flex items-center">
-                        <i data-lucide="check-circle" class="w-3 h-3 mr-2 text-green-400"></i>
-                        Booking Management
-                    </div>
-                    <div class="flex items-center">
-                        <i data-lucide="check-circle" class="w-3 h-3 mr-2 text-green-400"></i>
-                        Stock Control
-                    </div>
-                    <div class="flex items-center">
-                        <i data-lucide="check-circle" class="w-3 h-3 mr-2 text-green-400"></i>
-                        Revenue Analytics
-                    </div>
-                    <div class="flex items-center">
-                        <i data-lucide="check-circle" class="w-3 h-3 mr-2 text-green-400"></i>
-                        Menu Management
+            <div class="mt-8 p-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/50 rounded-2xl">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-500 mt-0.5"></i>
+                    <div>
+                        <h3 class="text-sm font-medium text-blue-900 dark:text-blue-400">Demo Credentials</h3>
+                        <p class="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                            Email: <code class="bg-blue-100 dark:bg-blue-800/50 px-1 py-0.5 rounded">admin@restaurant.com</code><br>
+                            Password: <code class="bg-blue-100 dark:bg-blue-800/50 px-1 py-0.5 rounded">admin123</code>
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="text-center mt-8">
-            <p class="text-white/50 text-sm">
-                © 2025 Mandi Restaurant. Powered by modern technology.
-            </p>
         </div>
     </div>
     
-    <!-- Floating Elements -->
-    <div class="absolute top-10 left-10 w-20 h-20 bg-white/5 rounded-full blur-xl animate-bounce-gentle"></div>
-    <div class="absolute bottom-10 right-10 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl animate-pulse"></div>
-    <div class="absolute top-1/3 right-20 w-16 h-16 bg-purple-400/10 rounded-full blur-xl animate-bounce-gentle" style="animation-delay: 1s;"></div>
+    <!-- Footer -->
+    <div class="text-center mt-8">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            Mandi Restaurant Management System
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Secure • Efficient • Modern
+        </p>
+    </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-fill demo credentials for easier testing
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    
-    // Add focus effects
-    [emailInput, passwordInput].forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('scale-105');
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('scale-105');
-        });
+    // Initialize icons when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
     });
-});
 </script>
 {% endblock %}
