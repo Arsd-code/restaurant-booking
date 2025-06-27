@@ -10,7 +10,57 @@
                 <i class="fas fa-calendar-check me-2"></i>
                 All Bookings
             </h2>
-            <span class="badge bg-primary fs-6">{{ bookings|length }} Total Bookings</span>
+            <div class="d-flex gap-2">
+                <span class="badge bg-primary fs-6">{{ bookings|length }} Bookings</span>
+                <span class="badge bg-success fs-6">₹{{ "%.2f"|format(total_revenue) }} Revenue</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Export -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter me-2"></i>
+                    Filter & Export
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="date" class="form-label">Filter by Date</label>
+                        <input type="date" class="form-control" id="date" name="date" value="{{ current_date_filter or '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="dish" class="form-label">Filter by Dish</label>
+                        <select class="form-select" id="dish" name="dish">
+                            <option value="">All Dishes</option>
+                            {% for dish_name in unique_dishes %}
+                            <option value="{{ dish_name }}" {% if current_dish_filter == dish_name %}selected{% endif %}>
+                                {{ dish_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{{ url_for('admin_bookings') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Clear
+                        </a>
+                        <a href="{{ url_for('export_bookings', date=current_date_filter, dish=current_dish_filter) }}" class="btn btn-success">
+                            <i class="fas fa-download me-2"></i>
+                            Export CSV
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -37,8 +87,12 @@
                                     Dish Booked
                                 </th>
                                 <th scope="col">
-                                    <i class="fas fa-dollar-sign me-2"></i>
-                                    Price
+                                    <i class="fas fa-sort-numeric-up me-2"></i>
+                                    Qty
+                                </th>
+                                <th scope="col">
+                                    <i class="fas fa-rupee-sign me-2"></i>
+                                    Total Price
                                 </th>
                                 <th scope="col">
                                     <i class="fas fa-clock me-2"></i>
@@ -48,6 +102,8 @@
                         </thead>
                         <tbody>
                             {% for booking in bookings %}
+                            {% set quantity = booking.get('quantity', 1) %}
+                            {% set total_price = booking.get('total_price', booking.dish_price * quantity) %}
                             <tr>
                                 <td>
                                     <strong>{{ booking.customer_name }}</strong>
@@ -61,7 +117,10 @@
                                     <span class="badge bg-success">{{ booking.dish_booked }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-success fw-bold">${{ "%.2f"|format(booking.dish_price) }}</span>
+                                    <span class="badge bg-info">{{ quantity }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-success fw-bold">₹{{ "%.2f"|format(total_price) }}</span>
                                 </td>
                                 <td>
                                     <small class="text-muted">{{ booking.timestamp }}</small>

@@ -51,20 +51,34 @@
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="dish_id" class="form-label">
-                            <i class="fas fa-bowl-food me-2"></i>
-                            Select Dish *
-                        </label>
-                        <select class="form-select" id="dish_id" name="dish_id" required>
-                            <option value="">Choose a dish...</option>
-                            {% for dish in dishes %}
-                            <option value="{{ loop.index0 }}">
-                                {{ dish.dish_name }} - ${{ "%.2f"|format(dish.price) }} 
-                                ({{ dish.available_quantity }} available)
-                            </option>
-                            {% endfor %}
-                        </select>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="dish_id" class="form-label">
+                                    <i class="fas fa-bowl-food me-2"></i>
+                                    Select Dish *
+                                </label>
+                                <select class="form-select" id="dish_id" name="dish_id" required>
+                                    <option value="">Choose a dish...</option>
+                                    {% for dish in dishes %}
+                                    <option value="{{ loop.index0 }}">
+                                        {{ dish.dish_name }} - ₹{{ "%.2f"|format(dish.price) }} 
+                                        ({{ dish.available_quantity }} available)
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">
+                                    <i class="fas fa-sort-numeric-up me-2"></i>
+                                    Quantity *
+                                </label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       value="1" min="1" max="50" required>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="alert alert-info">

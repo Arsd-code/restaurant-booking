@@ -1,0 +1,128 @@
+I want to build a web-based restaurant inventory and booking system for a Mandi restaurant. The system is admin-only, and customers do not use the app. The admin receives bookings via phone or in-person and records them in the system.
+
+This system should manage daily dish stock (e.g., 50 Chicken Mandi plates), update availability automatically, track revenue, and allow export of customer data.
+
+🔒 Admin Panel Features (Login-Protected):
+Daily Stock Management:
+
+Admin sets the available stock for each dish at the start of every day.
+
+Previous day's stock and bookings should be closed and view-only for reference (archived, not editable).
+
+Display a summary of yesterday’s stock usage and revenue.
+
+Dish Management:
+
+Add / Edit / Delete dishes (with name, price, description, image)
+
+Show all dishes like Chicken Mandi, Fish Mandi, Mutton Mandi etc. on the main dashboard with:
+
+Dish Name
+
+Price (in ₹ Indian Rupees)
+
+Available Quantity
+
+Booked Quantity
+
+Remaining Quantity
+
+When admin books 2 Chicken Mandis from 50 stock, dashboard should immediately show 48 left.
+
+Pop-up confirmation should appear before deleting a dish.
+
+Booking Module:
+
+Admin books a dish by filling customer name, contact, and dish selection.
+
+Automatically decrease available stock when a booking is made.
+
+Block booking for dishes with 0 stock (mark as “Out of Stock”).
+
+Revenue Tracking:
+
+Show total revenue:
+
+Daily (today’s total)
+
+Monthly
+
+Yearly
+
+Date-wise filter
+
+Revenue calculated as: dish price × number of bookings.
+
+Export Booking Data:
+
+Allow download/export of booking data as CSV or Excel file
+
+Include: customer name, contact, dish, price, booking time
+
+📊 Data Models
+Dishes Table:
+
+dish_name
+
+description
+
+price (₹ INR)
+
+available_quantity
+
+image_url
+
+Bookings Table:
+
+customer_name
+
+contact_number
+
+dish_booked
+
+quantity
+
+price
+
+timestamp
+
+Stock History Table (Daily Archives):
+
+date
+
+dish_name
+
+opening_stock
+
+booked_quantity
+
+closing_stock
+
+revenue
+
+✅ Tech Preferences:
+Frontend: HTML/CSS or Tailwind (clean, mobile-friendly UI)
+
+Backend: Python (Flask or FastAPI) or Node.js (Express)
+
+Storage: JSON file or SQLite DB
+
+Currency: ₹ Indian Rupees (display format: ₹450.00)
+
+Dashboard with real-time data updates
+
+🎯 Summary:
+Admin-only booking + inventory
+
+Daily stock reset with archive
+
+Pop-up for delete confirmation
+
+Dashboard showing per-dish availability
+
+Revenue reports (daily, monthly, yearly)
+
+Data export feature
+
+Currency: INR ₹
+

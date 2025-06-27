@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Revenue Tracking - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-chart-line me-2"></i>
+                Revenue Tracking
+            </h2>
+            <span class="badge bg-success fs-6">₹{{ "%.2f"|format(revenue_stats.all_time) }} Total Revenue</span>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Summary Cards -->
+<div class="row mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.today) }}</h4>
+                <p class="card-text mb-0">Today</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.yesterday) }}</h4>
+                <p class="card-text mb-0">Yesterday</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.this_month) }}</h4>
+                <p class="card-text mb-0">This Month</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.this_year) }}</h4>
+                <p class="card-text mb-0">This Year</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.all_time) }}</h4>
+                <p class="card-text mb-0">All Time</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-dark text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">{% if revenue_stats.yesterday > 0 %}{{ "%.1f"|format((revenue_stats.today / revenue_stats.yesterday * 100) - 100) }}%{% else %}N/A{% endif %}</h4>
+                <p class="card-text mb-0">vs Yesterday</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Revenue Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Daily Revenue (Last 7 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Revenue</th>
+                                <th>Visual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for day in daily_revenue %}
+                            {% set max_revenue = daily_revenue|map(attribute='revenue')|max %}
+                            {% set width_percent = (day.revenue / max_revenue * 100) if max_revenue > 0 else 0 %}
+                            <tr>
+                                <td>
+                                    <strong>{{ day.date }}</strong>
+                                    {% if day.date == (moment().format('YYYY-MM-DD') if moment else '') %}
+                                    <span class="badge bg-primary ms-1">Today</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-success fw-bold">₹{{ "%.2f"|format(day.revenue) }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ width_percent }}%" 
+                                             aria-valuenow="{{ day.revenue }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="{{ max_revenue }}">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_booking') }}" class="btn btn-success">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Make New Booking
+                    </a>
+                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-primary">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        View All Bookings
+                    </a>
+                    <a href="{{ url_for('export_bookings') }}" class="btn btn-info">
+                        <i class="fas fa-download me-2"></i>
+                        Export All Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Revenue Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-arrow-up text-success me-2"></i>
+                        <strong>Best Day:</strong> 
+                        {% set best_day = daily_revenue|selectattr('revenue', 'equalto', daily_revenue|map(attribute='revenue')|max)|first %}
+                        {{ best_day.date if best_day else 'N/A' }} (₹{{ "%.2f"|format(best_day.revenue if best_day else 0) }})
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-calculator text-info me-2"></i>
+                        <strong>Daily Average:</strong> 
+                        ₹{{ "%.2f"|format(daily_revenue|map(attribute='revenue')|sum / daily_revenue|length) if daily_revenue|length > 0 else 0 }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        <strong>Growth:</strong> 
+                        {% if revenue_stats.yesterday > 0 %}
+                            {% set growth = ((revenue_stats.today - revenue_stats.yesterday) / revenue_stats.yesterday * 100) %}
+                            {% if growth > 0 %}
+                                <span class="text-success">+{{ "%.1f"|format(growth) }}%</span>
+                            {% else %}
+                                <span class="text-danger">{{ "%.1f"|format(growth) }}%</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
