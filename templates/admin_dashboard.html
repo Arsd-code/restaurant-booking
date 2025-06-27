@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Restaurant Booking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Admin Dashboard
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total Dishes</h5>
+                        <h3 class="mb-0">{{ stats.total_dishes }}</h3>
+                    </div>
+                    <i class="fas fa-bowl-food fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total Bookings</h5>
+                        <h3 class="mb-0">{{ stats.total_bookings }}</h3>
+                    </div>
+                    <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Out of Stock</h5>
+                        <h3 class="mb-0">{{ stats.out_of_stock }}</h3>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Available</h5>
+                        <h3 class="mb-0">{{ stats.total_dishes - stats.out_of_stock }}</h3>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_dishes') }}" class="btn btn-primary">
+                        <i class="fas fa-bowl-food me-2"></i>
+                        Manage Dishes
+                    </a>
+                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-success">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        View All Bookings
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-info">
+                        <i class="fas fa-eye me-2"></i>
+                        View Customer Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Recent Bookings
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_bookings %}
+                <div class="list-group list-group-flush">
+                    {% for booking in stats.recent_bookings %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ booking.customer_name }}</h6>
+                                <p class="mb-1 text-muted">{{ booking.dish_booked }}</p>
+                                <small class="text-muted">{{ booking.contact_number }}</small>
+                            </div>
+                            <small class="text-muted">{{ booking.timestamp }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                    <p>No recent bookings</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

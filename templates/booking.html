@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ dish.dish_name }} - Restaurant Booking System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    Book Your Dish
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if dish.image_url %}
+                        <img src="{{ dish.image_url }}" class="img-fluid rounded mb-3" alt="{{ dish.dish_name }}">
+                        {% else %}
+                        <div class="dish-placeholder-booking d-flex align-items-center justify-content-center rounded mb-3">
+                            <i class="fas fa-bowl-food fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="text-primary">{{ dish.dish_name }}</h5>
+                        <p class="text-muted">{{ dish.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h5 text-success">${{ "%.2f"|format(dish.price) }}</span>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                {{ dish.available_quantity }} available
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="customer_name" class="form-label">
+                                    <i class="fas fa-user me-2"></i>
+                                    Full Name *
+                                </label>
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                       required placeholder="Enter your full name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_number" class="form-label">
+                                    <i class="fas fa-phone me-2"></i>
+                                    Contact Number *
+                                </label>
+                                <input type="tel" class="form-control" id="contact_number" name="contact_number" 
+                                       required placeholder="Enter your phone number">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Booking Details:</strong> You are booking 1 serving of {{ dish.dish_name }} for ${{ "%.2f"|format(dish.price) }}.
+                        Please arrive within 30 minutes of your booking time.
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>
+                            Confirm Booking
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Menu
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
