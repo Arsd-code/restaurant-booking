@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a Flask-based restaurant booking system that allows customers to view available dishes and make bookings, while providing administrators with tools to manage dishes and view bookings. The application uses a simple file-based JSON storage system for data persistence.
+This is a Flask-based restaurant inventory and booking system designed for admin-only operation. Customers call the restaurant and the admin enters bookings manually through the web interface. The system is specifically designed for Mandi restaurants with limited daily dish quantities. The application uses a simple file-based JSON storage system for data persistence.
 
 ## System Architecture
 
@@ -50,18 +50,25 @@ This is a Flask-based restaurant booking system that allows customers to view av
 
 ## Data Flow
 
-### Customer Flow
-1. Customer visits homepage (`/`) to view available dishes
-2. Customer selects a dish and navigates to booking page
-3. Customer fills out booking form with personal details
-4. Booking is saved to JSON file and dish quantity is decremented
+### Customer Flow (Phone-based)
+1. Customer calls the restaurant to place an order
+2. Admin receives customer details over the phone
+3. Admin enters booking information through the admin panel
 
 ### Admin Flow
-1. Admin logs in via `/admin/login` with credentials
+1. Admin logs in via `/admin/login` with credentials (admin@restaurant.com / admin123)
 2. Admin can view dashboard with statistics
-3. Admin can manage dishes (add, edit, delete) via `/admin/dishes`
-4. Admin can view all bookings via `/admin/bookings`
-5. Admin can logout to end session
+3. Admin can make bookings on behalf of customers via `/admin/booking`
+4. Admin can manage dishes (add, edit, delete) via `/admin/dishes`
+5. Admin can view all bookings via `/admin/bookings`
+6. Admin can logout to end session
+
+### Booking Process
+1. Admin receives customer call with order details
+2. Admin selects customer's desired dish from available options
+3. System automatically reduces dish quantity by 1
+4. Booking is saved with timestamp and customer information
+5. Admin can view confirmation and proceed with next order
 
 ## External Dependencies
 
@@ -94,10 +101,23 @@ This is a Flask-based restaurant booking system that allows customers to view av
 - PostgreSQL package included for potential database migration
 - OpenSSL for secure communications
 
+## Recent Changes
+
+- June 27, 2025: Converted system from customer-facing to admin-only operation
+  - Removed public customer interface
+  - Added admin booking form for phone orders
+  - Updated navigation to focus on admin tasks
+  - Root URL now redirects to admin login
+  - Added sample Mandi dishes with realistic quantities
+  - Enhanced admin dashboard with booking functionality
+
 ## Changelog
 
-- June 27, 2025. Initial setup
+- June 27, 2025: Initial setup
+- June 27, 2025: Major architectural change - converted to admin-only booking system
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Restaurant focus: Mandi dishes with limited daily quantities
+Operation model: Phone-based orders with admin data entry

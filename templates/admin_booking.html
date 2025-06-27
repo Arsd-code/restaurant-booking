@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Make Booking - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-user-plus me-2"></i>
+                Make Customer Booking
+            </h2>
+            <span class="badge bg-info fs-6">{{ dishes|length }} Available Dishes</span>
+        </div>
+    </div>
+</div>
+
+{% if dishes %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-phone me-2"></i>
+                    Customer Booking Form
+                </h5>
+                <small class="text-muted">Enter customer details received over the phone</small>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="customer_name" class="form-label">
+                                    <i class="fas fa-user me-2"></i>
+                                    Customer Name *
+                                </label>
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                       required placeholder="Enter customer's full name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_number" class="form-label">
+                                    <i class="fas fa-phone me-2"></i>
+                                    Contact Number *
+                                </label>
+                                <input type="tel" class="form-control" id="contact_number" name="contact_number" 
+                                       required placeholder="Enter customer's phone number">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dish_id" class="form-label">
+                            <i class="fas fa-bowl-food me-2"></i>
+                            Select Dish *
+                        </label>
+                        <select class="form-select" id="dish_id" name="dish_id" required>
+                            <option value="">Choose a dish...</option>
+                            {% for dish in dishes %}
+                            <option value="{{ loop.index0 }}">
+                                {{ dish.dish_name }} - ${{ "%.2f"|format(dish.price) }} 
+                                ({{ dish.available_quantity }} available)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Booking Process:</strong> This will create a booking for 1 serving and automatically reduce the dish quantity by 1.
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>
+                            Confirm Booking
+                        </button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Dishes Summary -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Available Dishes Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for dish in dishes %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">{{ dish.dish_name }}</h6>
+                                <p class="card-text small text-muted">{{ dish.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-success">${{ "%.2f"|format(dish.price) }}</span>
+                                    <span class="badge bg-success">{{ dish.available_quantity }} left</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+    <h3 class="text-warning">No Available Dishes</h3>
+    <p class="text-muted">All dishes are currently out of stock. Please add dishes or restock existing ones.</p>
+    <div class="d-flex gap-2 justify-content-center">
+        <a href="{{ url_for('admin_dishes') }}" class="btn btn-primary">
+            <i class="fas fa-bowl-food me-2"></i>
+            Manage Dishes
+        </a>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

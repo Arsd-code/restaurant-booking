@@ -78,17 +78,17 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_booking') }}" class="btn btn-success">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Make Customer Booking
+                    </a>
                     <a href="{{ url_for('admin_dishes') }}" class="btn btn-primary">
                         <i class="fas fa-bowl-food me-2"></i>
                         Manage Dishes
                     </a>
-                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-success">
+                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-info">
                         <i class="fas fa-calendar-check me-2"></i>
                         View All Bookings
-                    </a>
-                    <a href="{{ url_for('index') }}" class="btn btn-info">
-                        <i class="fas fa-eye me-2"></i>
-                        View Customer Site
                     </a>
                 </div>
             </div>

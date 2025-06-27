@@ -43,62 +43,20 @@ def save_bookings(bookings):
     with open('data/bookings.json', 'w') as f:
         json.dump(bookings, f, indent=2)
 
+def admin_required(f):
+    """Decorator to require admin login"""
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            flash('Please log in to access the admin panel.', 'error')
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
+
 @app.route('/')
 def index():
-    """Customer homepage showing available dishes"""
-    dishes = load_dishes()
-    return render_template('index.html', dishes=dishes)
-
-@app.route('/book/<int:dish_id>')
-def book_dish(dish_id):
-    """Show booking form for a specific dish"""
-    dishes = load_dishes()
-    if dish_id >= len(dishes) or dishes[dish_id]['available_quantity'] <= 0:
-        flash('This dish is not available for booking.', 'error')
-        return redirect(url_for('index'))
-    
-    dish = dishes[dish_id]
-    return render_template('booking.html', dish=dish, dish_id=dish_id)
-
-@app.route('/book/<int:dish_id>', methods=['POST'])
-def process_booking(dish_id):
-    """Process the booking form submission"""
-    dishes = load_dishes()
-    
-    # Validate dish availability
-    if dish_id >= len(dishes) or dishes[dish_id]['available_quantity'] <= 0:
-        flash('Sorry, this dish is no longer available.', 'error')
-        return redirect(url_for('index'))
-    
-    # Get form data
-    customer_name = request.form.get('customer_name', '').strip()
-    contact_number = request.form.get('contact_number', '').strip()
-    
-    # Validate form data
-    if not customer_name or not contact_number:
-        flash('Please fill in all required fields.', 'error')
-        return render_template('booking.html', dish=dishes[dish_id], dish_id=dish_id)
-    
-    # Create booking
-    booking = {
-        'customer_name': customer_name,
-        'contact_number': contact_number,
-        'dish_booked': dishes[dish_id]['dish_name'],
-        'dish_price': dishes[dish_id]['price'],
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    
-    # Save booking
-    bookings = load_bookings()
-    bookings.append(booking)
-    save_bookings(bookings)
-    
-    # Reduce dish quantity
-    dishes[dish_id]['available_quantity'] -= 1
-    save_dishes(dishes)
-    
-    flash(f'Booking confirmed! You have successfully booked {dishes[dish_id]["dish_name"]}.', 'success')
-    return redirect(url_for('index'))
+    """Redirect to admin login - no public customer interface"""
+    return redirect(url_for('admin_login'))
 
 @app.route('/admin/login')
 def admin_login():
@@ -111,7 +69,7 @@ def admin_login_post():
     email = request.form.get('email')
     password = request.form.get('password')
     
-    if email == ADMIN_EMAIL and check_password_hash(ADMIN_PASSWORD_HASH, password):
+    if email == ADMIN_EMAIL and password and check_password_hash(ADMIN_PASSWORD_HASH, password):
         session['admin_logged_in'] = True
         flash('Welcome to the admin panel!', 'success')
         return redirect(url_for('admin_dashboard'))
@@ -124,17 +82,7 @@ def admin_logout():
     """Admin logout"""
     session.pop('admin_logged_in', None)
     flash('You have been logged out.', 'info')
-    return redirect(url_for('index'))
-
-def admin_required(f):
-    """Decorator to require admin login"""
-    def decorated_function(*args, **kwargs):
-        if not session.get('admin_logged_in'):
-            flash('Please log in to access the admin panel.', 'error')
-            return redirect(url_for('admin_login'))
-        return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
-    return decorated_function
+    return redirect(url_for('admin_login'))
 
 @app.route('/admin')
 @admin_required
@@ -156,6 +104,63 @@ def admin_dashboard():
     }
     
     return render_template('admin_dashboard.html', stats=stats)
+
+@app.route('/admin/booking')
+@admin_required
+def admin_booking():
+    """Show admin booking form"""
+    dishes = load_dishes()
+    # Filter only available dishes
+    available_dishes = [dish for dish in dishes if dish['available_quantity'] > 0]
+    return render_template('admin_booking.html', dishes=available_dishes)
+
+@app.route('/admin/booking', methods=['POST'])
+@admin_required
+def admin_process_booking():
+    """Process admin booking form submission"""
+    dishes = load_dishes()
+    
+    # Get form data
+    customer_name = request.form.get('customer_name', '').strip()
+    contact_number = request.form.get('contact_number', '').strip()
+    dish_id = request.form.get('dish_id', '').strip()
+    
+    # Validate form data
+    if not customer_name or not contact_number or not dish_id:
+        flash('Please fill in all required fields.', 'error')
+        return redirect(url_for('admin_booking'))
+    
+    try:
+        dish_id = int(dish_id)
+    except ValueError:
+        flash('Invalid dish selection.', 'error')
+        return redirect(url_for('admin_booking'))
+    
+    # Validate dish availability
+    if dish_id >= len(dishes) or dishes[dish_id]['available_quantity'] <= 0:
+        flash('Sorry, this dish is no longer available.', 'error')
+        return redirect(url_for('admin_booking'))
+    
+    # Create booking
+    booking = {
+        'customer_name': customer_name,
+        'contact_number': contact_number,
+        'dish_booked': dishes[dish_id]['dish_name'],
+        'dish_price': dishes[dish_id]['price'],
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    # Save booking
+    bookings = load_bookings()
+    bookings.append(booking)
+    save_bookings(bookings)
+    
+    # Reduce dish quantity
+    dishes[dish_id]['available_quantity'] -= 1
+    save_dishes(dishes)
+    
+    flash(f'Booking confirmed for {customer_name}! Dish: {dishes[dish_id]["dish_name"]} (${dishes[dish_id]["price"]:.2f})', 'success')
+    return redirect(url_for('admin_booking'))
 
 @app.route('/admin/dishes')
 @admin_required
