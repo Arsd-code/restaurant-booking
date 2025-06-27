@@ -520,5 +520,91 @@ def reset_daily_stock():
     flash('Daily stock has been reset successfully!', 'success')
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/stock-calendar')
+@admin_required
+def admin_stock_calendar():
+    """Stock management calendar interface"""
+    selected_date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    
+    # Load stock history
+    stock_history = load_stock_history()
+    
+    # Get stock data for selected date
+    date_stock = None
+    for entry in stock_history:
+        if entry['date'] == selected_date:
+            date_stock = entry
+            break
+    
+    # If no historical data for this date, use current stock
+    if not date_stock:
+        current_dishes = load_dishes()
+        date_stock = {
+            'date': selected_date,
+            'dishes': current_dishes
+        }
+    
+    return render_template('admin_stock_calendar.html', 
+                         selected_date=selected_date,
+                         date_stock=date_stock,
+                         stock_history=stock_history)
+
+@app.route('/admin/update-stock-date', methods=['POST'])
+@admin_required
+def update_stock_date():
+    """Update stock quantities for a specific date"""
+    selected_date = None
+    try:
+        selected_date = request.form.get('selected_date')
+        if not selected_date:
+            flash('No date selected!', 'error')
+            return redirect(url_for('admin_stock_calendar'))
+        
+        # Load current stock history
+        stock_history = load_stock_history()
+        
+        # Find or create entry for this date
+        date_entry = None
+        for i, entry in enumerate(stock_history):
+            if entry['date'] == selected_date:
+                date_entry = entry
+                date_index = i
+                break
+        
+        if not date_entry:
+            # Create new entry
+            dishes = load_dishes()
+            date_entry = {
+                'date': selected_date,
+                'dishes': dishes.copy()
+            }
+            stock_history.append(date_entry)
+            date_index = len(stock_history) - 1
+        
+        # Update quantities from form
+        for dish in date_entry['dishes']:
+            dish_id = str(dish.get('id', dish['dish_name']))
+            quantity_key = f'quantity_{dish_id}'
+            if quantity_key in request.form:
+                new_quantity = int(request.form[quantity_key])
+                dish['available_quantity'] = new_quantity
+        
+        # Save updated history
+        save_stock_history(stock_history)
+        
+        # If updating today's date, also update current dishes
+        today = datetime.now().strftime('%Y-%m-%d')
+        if selected_date == today:
+            save_dishes(date_entry['dishes'])
+        
+        flash(f'Stock updated successfully for {selected_date}!', 'success')
+        
+    except Exception as e:
+        flash(f'Error updating stock: {str(e)}', 'error')
+        if not selected_date:
+            selected_date = datetime.now().strftime('%Y-%m-%d')
+    
+    return redirect(url_for('admin_stock_calendar', date=selected_date))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

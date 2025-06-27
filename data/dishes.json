@@ -2,28 +2,28 @@
   {
     "dish_name": "Chicken Mandi",
     "description": "Traditional Arabian rice dish with tender chicken, aromatic spices, and perfectly cooked basmati rice",
-    "price": 450.00,
-    "available_quantity": 48,
+    "price": 450.0,
+    "available_quantity": 44,
     "image_url": null
   },
   {
     "dish_name": "Lamb Mandi",
     "description": "Succulent lamb slow-cooked with traditional spices, served with fragrant saffron rice",
-    "price": 650.00,
+    "price": 650.0,
     "available_quantity": 30,
     "image_url": null
   },
   {
     "dish_name": "Fish Mandi",
     "description": "Fresh fish marinated in aromatic spices, grilled to perfection and served with basmati rice",
-    "price": 550.00,
+    "price": 550.0,
     "available_quantity": 25,
     "image_url": null
   },
   {
     "dish_name": "Mixed Grill Mandi",
     "description": "A combination of chicken, lamb, and fish with traditional Mandi rice and special sauce",
-    "price": 850.00,
+    "price": 850.0,
     "available_quantity": 20,
     "image_url": null
   }

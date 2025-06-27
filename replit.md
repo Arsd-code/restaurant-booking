@@ -111,6 +111,14 @@ This is a Flask-based restaurant inventory and booking system designed for admin
   - Added sample Mandi dishes with realistic quantities
   - Enhanced admin dashboard with booking functionality
 
+- June 27, 2025: Added advanced stock management and confirmation features
+  - Implemented calendar-based stock editing system
+  - Added date-based stock history tracking
+  - Created confirmation modals for dish deletion
+  - Updated pricing system to Indian Rupees (₹450-850)
+  - Added stock calendar interface with past/future date editing
+  - Enhanced revenue tracking with detailed analytics
+
 ## Changelog
 
 - June 27, 2025: Initial setup
