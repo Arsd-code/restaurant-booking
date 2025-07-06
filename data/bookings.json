@@ -3,14 +3,45 @@
     "customer_name": "suhaib",
     "contact_number": "9080342332",
     "dish_booked": "Chicken Mandi",
-    "dish_price": 18.99,
+    "quantity": 1,
+    "dish_price": 450.0,
+    "total_price": 450.0,
     "timestamp": "2025-06-27 16:26:42"
   },
   {
     "customer_name": "ameer",
     "contact_number": "9080342387",
     "dish_booked": "Chicken Mandi",
-    "dish_price": 18.99,
+    "quantity": 1,
+    "dish_price": 450.0,
+    "total_price": 450.0,
     "timestamp": "2025-06-27 16:33:30"
+  },
+  {
+    "customer_name": "SUHAIB I",
+    "contact_number": "+917845420505",
+    "dish_booked": "Chicken Mandi",
+    "quantity": 3,
+    "dish_price": 450.0,
+    "total_price": 1350.0,
+    "timestamp": "2025-06-28 18:06:26"
+  },
+  {
+    "customer_name": "messi",
+    "contact_number": "+919363584427",
+    "dish_booked": "Chicken Mandi",
+    "quantity": 11,
+    "dish_price": 450.0,
+    "total_price": 4950.0,
+    "timestamp": "2025-06-28 18:07:37"
+  },
+  {
+    "customer_name": "sdfghj",
+    "contact_number": "123456789",
+    "dish_booked": "Fish Mandi",
+    "quantity": 25,
+    "dish_price": 550.0,
+    "total_price": 13750.0,
+    "timestamp": "2025-06-28 19:28:08"
   }
 ]

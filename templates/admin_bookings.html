@@ -1,187 +1,225 @@
-{% extends "base.html" %}
+{% extends "base_modern.html" %}
 
-{% block title %}View Bookings - Restaurant Booking System{% endblock %}
+{% block title %}All Bookings - Mandi Restaurant{% endblock %}
+
+{% block header %}All Bookings{% endblock %}
+{% block subtitle %}View and manage customer orders{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>
-                <i class="fas fa-calendar-check me-2"></i>
-                All Bookings
-            </h2>
-            <div class="d-flex gap-2">
-                <span class="badge bg-primary fs-6">{{ bookings|length }} Bookings</span>
-                <span class="badge bg-success fs-6">₹{{ "%.2f"|format(total_revenue) }} Revenue</span>
+<div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Bookings -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bookings</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ bookings|length }}</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center">
+                        <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
+                        All time
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Filters and Export -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-filter me-2"></i>
-                    Filter & Export
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="date" class="form-label">Filter by Date</label>
-                        <input type="date" class="form-control" id="date" name="date" value="{{ current_date_filter or '' }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="dish" class="form-label">Filter by Dish</label>
-                        <select class="form-select" id="dish" name="dish">
-                            <option value="">All Dishes</option>
-                            {% for dish_name in unique_dishes %}
-                            <option value="{{ dish_name }}" {% if current_dish_filter == dish_name %}selected{% endif %}>
-                                {{ dish_name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search me-2"></i>
-                            Apply Filters
-                        </button>
-                        <a href="{{ url_for('admin_bookings') }}" class="btn btn-secondary">
-                            <i class="fas fa-times me-2"></i>
-                            Clear
-                        </a>
-                        <a href="{{ url_for('export_bookings', date=current_date_filter, dish=current_dish_filter) }}" class="btn btn-success">
-                            <i class="fas fa-download me-2"></i>
-                            Export CSV
-                        </a>
-                    </div>
-                </form>
+        <!-- Today's Bookings -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Bookings</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ today_bookings|length }}</p>
+                    <p class="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center">
+                        <i data-lucide="calendar" class="w-3 h-3 mr-1"></i>
+                        {{ today }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="calendar-days" class="w-6 h-6 text-white"></i>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-{% if bookings %}
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <i class="fas fa-user me-2"></i>
-                                    Customer Name
-                                </th>
-                                <th scope="col">
-                                    <i class="fas fa-phone me-2"></i>
-                                    Contact
-                                </th>
-                                <th scope="col">
-                                    <i class="fas fa-bowl-food me-2"></i>
-                                    Dish Booked
-                                </th>
-                                <th scope="col">
-                                    <i class="fas fa-sort-numeric-up me-2"></i>
-                                    Qty
-                                </th>
-                                <th scope="col">
-                                    <i class="fas fa-rupee-sign me-2"></i>
-                                    Total Price
-                                </th>
-                                <th scope="col">
-                                    <i class="fas fa-clock me-2"></i>
-                                    Booking Time
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for booking in bookings %}
-                            {% set quantity = booking.get('quantity', 1) %}
-                            {% set total_price = booking.get('total_price', booking.dish_price * quantity) %}
-                            <tr>
-                                <td>
-                                    <strong>{{ booking.customer_name }}</strong>
-                                </td>
-                                <td>
-                                    <a href="tel:{{ booking.contact_number }}" class="text-decoration-none">
-                                        {{ booking.contact_number }}
-                                    </a>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">{{ booking.dish_booked }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-info">{{ quantity }}</span>
-                                </td>
-                                <td>
-                                    <span class="text-success fw-bold">₹{{ "%.2f"|format(total_price) }}</span>
-                                </td>
-                                <td>
-                                    <small class="text-muted">{{ booking.timestamp }}</small>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- Total Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ total_revenue }}</p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1 flex items-center">
+                        <i data-lucide="dollar-sign" class="w-3 h-3 mr-1"></i>
+                        All time
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Order Value -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Order Value</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ "%.2f"|format(avg_order_value) }}</p>
+                    <p class="text-xs text-orange-600 dark:text-orange-400 mt-1 flex items-center">
+                        <i data-lucide="bar-chart-3" class="w-3 h-3 mr-1"></i>
+                        Per order
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>
-                    Booking Summary
-                </h5>
+    <!-- Filters and Actions -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+            <div class="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                    <i data-lucide="list" class="w-6 h-6 mr-3 text-blue-500"></i>
+                    All Bookings
+                </h2>
+                <div class="flex items-center space-x-2">
+                    <a href="{{ url_for('admin_bookings', filter='all') }}" 
+                       class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 {% if active_filter == 'all' %}bg-gray-100 dark:bg-gray-800{% endif %}">
+                        All
+                    </a>
+                    <a href="{{ url_for('admin_bookings', filter='today') }}"
+                       class="px-4 py-2 text-sm font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 {% if active_filter == 'today' %}bg-green-50 dark:bg-green-900/20{% endif %}">
+                        Today
+                    </a>
+                    <a href="{{ url_for('admin_bookings', filter='week') }}"
+                       class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 {% if active_filter == 'week' %}bg-blue-50 dark:bg-blue-900/20{% endif %}">
+                        This Week
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-primary">{{ bookings|length }}</h4>
-                            <p class="text-muted mb-0">Total Bookings</p>
+            
+            <div class="flex space-x-3">
+                <a href="/admin/export" 
+                   class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center space-x-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Export CSV</span>
+                </a>
+                <a href="/admin/booking" 
+                   class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>New Booking</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings List -->
+    <div class="space-y-4" id="bookings-list">
+        {% if bookings %}
+            {% for booking in bookings %}
+            <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 animate-scale-in booking-item" data-date="{{ booking.timestamp.split(' ')[0] }}">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0 lg:space-x-6">
+                    <!-- Customer Info -->
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ booking.customer_name }}</h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                                <span class="flex items-center">
+                                    <i data-lucide="phone" class="w-4 h-4 mr-1"></i>
+                                    {{ booking.contact_number }}
+                                </span>
+                                {% if booking.customer_email %}
+                                <span class="flex items-center">
+                                    <i data-lucide="mail" class="w-4 h-4 mr-1"></i>
+                                    {{ booking.customer_email }}
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-success">
-                                ${{ "%.2f"|format(bookings|sum(attribute='dish_price')) }}
-                            </h4>
-                            <p class="text-muted mb-0">Total Revenue</p>
+
+                    <!-- Order Details -->
+                    <div class="flex flex-col lg:flex-row lg:items-center space-y-2 lg:space-y-0 lg:space-x-6">
+                        <div class="text-center lg:text-left">
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ booking.dish_booked }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.quantity }}x • {{ booking.timestamp.split(' ')[0] }}</p>
+                        </div>
+                        
+                        <div class="text-center lg:text-right">
+                            <p class="text-xl font-bold text-gray-900 dark:text-white">₹{{ "%.2f"|format(booking.total_price) }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ booking.timestamp.split(' ')[1] }}</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-info">
-                                {{ bookings|map(attribute='dish_booked')|list|unique|list|length }}
-                            </h4>
-                            <p class="text-muted mb-0">Different Dishes Booked</p>
+
+                    <!-- Status Badge -->
+                    <div class="flex items-center justify-center lg:justify-end">
+                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                            Confirmed
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Summary (Collapsible) -->
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Dish Price:</span>
+                            <span class="font-medium text-gray-900 dark:text-white">₹{{ "%.2f"|format(booking.dish_price) }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Quantity:</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ booking.quantity }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">Total:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">₹{{ "%.2f"|format(booking.total_price) }}</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="glass dark:glass-dark rounded-2xl p-12 text-center">
+                <div class="w-24 h-24 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="inbox" class="w-12 h-12 text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Bookings Yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">Start by creating your first customer order.</p>
+                <a href="/admin/booking" 
+                   class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 inline-flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Create First Booking</span>
+                </a>
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Pagination (if needed) -->
+    {% if bookings|length > 10 %}
+    <div class="flex items-center justify-center space-x-2">
+        <button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+        <span class="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white">Page 1 of 1</span>
+        <button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div class="text-center py-5">
-    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
-    <h3 class="text-muted">No Bookings Yet</h3>
-    <p class="text-muted">Bookings will appear here once customers start making reservations.</p>
-    <a href="{{ url_for('index') }}" class="btn btn-primary">
-        <i class="fas fa-eye me-2"></i>
-        View Customer Site
-    </a>
-</div>
-{% endif %}
+
+<script>
+    // Initialize Lucide icons after the content loads
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
 {% endblock %}

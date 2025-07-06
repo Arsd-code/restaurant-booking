@@ -1,190 +1,262 @@
-{% extends "base.html" %}
+{% extends "base_modern.html" %}
 
-{% block title %}Revenue Tracking - Admin Panel{% endblock %}
+{% block title %}Revenue Analytics - Mandi Restaurant{% endblock %}
+
+{% block header %}Revenue Analytics{% endblock %}
+{% block subtitle %}Track your restaurant's financial performance{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>
-                <i class="fas fa-chart-line me-2"></i>
-                Revenue Tracking
+<div class="max-w-7xl mx-auto space-y-8 animate-fade-in">
+    <!-- Revenue Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Today's Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Revenue</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ daily_revenue }}</p>
+                    <p class="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center">
+                        <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
+                        +{{ daily_growth }}% from yesterday
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="dollar-sign" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">This Week</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ weekly_revenue }}</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center">
+                        <i data-lucide="calendar" class="w-3 h-3 mr-1"></i>
+                        {{ weekly_orders }} orders
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="calendar-days" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">This Month</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ monthly_revenue }}</p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1 flex items-center">
+                        <i data-lucide="bar-chart-3" class="w-3 h-3 mr-1"></i>
+                        {{ monthly_orders }} orders
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yearly Revenue -->
+        <div class="glass dark:glass-dark rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">This Year</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ yearly_revenue }}</p>
+                    <p class="text-xs text-orange-600 dark:text-orange-400 mt-1 flex items-center">
+                        <i data-lucide="target" class="w-3 h-3 mr-1"></i>
+                        {{ yearly_orders }} orders
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                <i data-lucide="filter" class="w-6 h-6 mr-3 text-blue-500"></i>
+                Revenue Analysis
             </h2>
-            <span class="badge bg-success fs-6">₹{{ "%.2f"|format(revenue_stats.all_time) }} Total Revenue</span>
+            
+            <form method="GET" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">From:</label>
+                    <input type="date" name="start_date" value="{{ start_date }}" 
+                           class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200">
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">To:</label>
+                    <input type="date" name="end_date" value="{{ end_date }}" 
+                           class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200">
+                </div>
+                <button type="submit" 
+                        class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center space-x-2">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span>Filter</span>
+                </button>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Revenue Summary Cards -->
-<div class="row mb-4">
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.today) }}</h4>
-                <p class="card-text mb-0">Today</p>
+    <!-- Revenue Chart -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <i data-lucide="bar-chart-3" class="w-6 h-6 mr-3 text-purple-500"></i>
+            Revenue Trend
+        </h2>
+        
+        <div class="h-64 flex items-end justify-center space-x-2">
+            {% for day in revenue_chart_data %}
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-8 bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-lg transition-all duration-300 hover:scale-110" 
+                     style="height: {{ (day.revenue / max_revenue * 200) }}px">
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-400">{{ day.date }}</span>
+                <span class="text-xs font-medium text-gray-900 dark:text-white">₹{{ day.revenue }}</span>
             </div>
+            {% endfor %}
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-info text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.yesterday) }}</h4>
-                <p class="card-text mb-0">Yesterday</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.this_month) }}</h4>
-                <p class="card-text mb-0">This Month</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.this_year) }}</h4>
-                <p class="card-text mb-0">This Year</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-secondary text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">₹{{ "%.2f"|format(revenue_stats.all_time) }}</h4>
-                <p class="card-text mb-0">All Time</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-        <div class="card bg-dark text-white">
-            <div class="card-body text-center">
-                <h4 class="card-title">{% if revenue_stats.yesterday > 0 %}{{ "%.1f"|format((revenue_stats.today / revenue_stats.yesterday * 100) - 100) }}%{% else %}N/A{% endif %}</h4>
-                <p class="card-text mb-0">vs Yesterday</p>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Daily Revenue Chart -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-bar me-2"></i>
-                    Daily Revenue (Last 7 Days)
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Revenue</th>
-                                <th>Visual</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for day in daily_revenue %}
-                            {% set max_revenue = daily_revenue|map(attribute='revenue')|max %}
-                            {% set width_percent = (day.revenue / max_revenue * 100) if max_revenue > 0 else 0 %}
-                            <tr>
-                                <td>
-                                    <strong>{{ day.date }}</strong>
-                                    {% if day.date == (moment().format('YYYY-MM-DD') if moment else '') %}
-                                    <span class="badge bg-primary ms-1">Today</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-success fw-bold">₹{{ "%.2f"|format(day.revenue) }}</td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar bg-success" role="progressbar" 
-                                             style="width: {{ width_percent }}%" 
-                                             aria-valuenow="{{ day.revenue }}" 
-                                             aria-valuemin="0" 
-                                             aria-valuemax="{{ max_revenue }}">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <!-- Top Performing Dishes -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <i data-lucide="trophy" class="w-6 h-6 mr-3 text-yellow-500"></i>
+            Top Performing Dishes
+        </h2>
+        
+        <div class="space-y-4">
+            {% for dish in top_dishes %}
+            <div class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                        <i data-lucide="chef-hat" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ dish.name }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ dish.orders }} orders</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-gray-900 dark:text-white">₹{{ dish.revenue }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ "%.1f"|format(dish.percentage) }}% of total</p>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
-</div>
 
-<!-- Quick Actions -->
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-tools me-2"></i>
-                    Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ url_for('admin_booking') }}" class="btn btn-success">
-                        <i class="fas fa-user-plus me-2"></i>
-                        Make New Booking
-                    </a>
-                    <a href="{{ url_for('admin_bookings') }}" class="btn btn-primary">
-                        <i class="fas fa-calendar-check me-2"></i>
-                        View All Bookings
-                    </a>
-                    <a href="{{ url_for('export_bookings') }}" class="btn btn-info">
-                        <i class="fas fa-download me-2"></i>
-                        Export All Data
-                    </a>
-                </div>
-            </div>
+    <!-- Revenue Summary Table -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <i data-lucide="table" class="w-6 h-6 mr-3 text-green-500"></i>
+            Revenue Summary
+        </h2>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Period</th>
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Orders</th>
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Revenue</th>
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Avg Order</th>
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Growth</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">Today</td>
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ daily_orders }}</td>
+                        <td class="py-3 px-4 font-semibold text-gray-900 dark:text-white">₹{{ daily_revenue }}</td>
+                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">₹{{ "%.2f"|format(daily_avg) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                +{{ daily_growth }}%
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">This Week</td>
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ weekly_orders }}</td>
+                        <td class="py-3 px-4 font-semibold text-gray-900 dark:text-white">₹{{ weekly_revenue }}</td>
+                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">₹{{ "%.2f"|format(weekly_avg) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                +{{ weekly_growth }}%
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">This Month</td>
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ monthly_orders }}</td>
+                        <td class="py-3 px-4 font-semibold text-gray-900 dark:text-white">₹{{ monthly_revenue }}</td>
+                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">₹{{ "%.2f"|format(monthly_avg) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                +{{ monthly_growth }}%
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">This Year</td>
+                        <td class="py-3 px-4 text-gray-900 dark:text-white">{{ yearly_orders }}</td>
+                        <td class="py-3 px-4 font-semibold text-gray-900 dark:text-white">₹{{ yearly_revenue }}</td>
+                        <td class="py-3 px-4 text-gray-600 dark:text-gray-400">₹{{ "%.2f"|format(yearly_avg) }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                                +{{ yearly_growth }}%
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Revenue Insights
-                </h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled">
-                    <li class="mb-2">
-                        <i class="fas fa-arrow-up text-success me-2"></i>
-                        <strong>Best Day:</strong> 
-                        {% set best_day = daily_revenue|selectattr('revenue', 'equalto', daily_revenue|map(attribute='revenue')|max)|first %}
-                        {{ best_day.date if best_day else 'N/A' }} (₹{{ "%.2f"|format(best_day.revenue if best_day else 0) }})
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-calculator text-info me-2"></i>
-                        <strong>Daily Average:</strong> 
-                        ₹{{ "%.2f"|format(daily_revenue|map(attribute='revenue')|sum / daily_revenue|length) if daily_revenue|length > 0 else 0 }}
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-chart-line text-primary me-2"></i>
-                        <strong>Growth:</strong> 
-                        {% if revenue_stats.yesterday > 0 %}
-                            {% set growth = ((revenue_stats.today - revenue_stats.yesterday) / revenue_stats.yesterday * 100) %}
-                            {% if growth > 0 %}
-                                <span class="text-success">+{{ "%.1f"|format(growth) }}%</span>
-                            {% else %}
-                                <span class="text-danger">{{ "%.1f"|format(growth) }}%</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="text-muted">N/A</span>
-                        {% endif %}
-                    </li>
-                </ul>
-            </div>
+
+    <!-- Export Options -->
+    <div class="glass dark:glass-dark rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <i data-lucide="download" class="w-6 h-6 mr-3 text-green-500"></i>
+            Export Reports
+        </h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="/admin/export?type=daily" 
+               class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-center">
+                <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="font-semibold">Daily Report</p>
+                <p class="text-sm opacity-90">Today's data</p>
+            </a>
+            
+            <a href="/admin/export?type=weekly" 
+               class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-center">
+                <i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="font-semibold">Weekly Report</p>
+                <p class="text-sm opacity-90">This week's data</p>
+            </a>
+            
+            <a href="/admin/export?type=monthly" 
+               class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-center">
+                <i data-lucide="bar-chart-3" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="font-semibold">Monthly Report</p>
+                <p class="text-sm opacity-90">This month's data</p>
+            </a>
+            
+            <a href="/admin/export?type=yearly" 
+               class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 text-center">
+                <i data-lucide="target" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="font-semibold">Yearly Report</p>
+                <p class="text-sm opacity-90">This year's data</p>
+            </a>
         </div>
     </div>
 </div>

@@ -2,8 +2,8 @@
   {
     "dish_name": "Chicken Mandi",
     "description": "Traditional Arabian rice dish with tender chicken, aromatic spices, and perfectly cooked basmati rice",
-    "price": 450.0,
-    "available_quantity": 44,
+    "price": 800.0,
+    "available_quantity": 997,
     "image_url": null
   },
   {
@@ -17,7 +17,7 @@
     "dish_name": "Fish Mandi",
     "description": "Fresh fish marinated in aromatic spices, grilled to perfection and served with basmati rice",
     "price": 550.0,
-    "available_quantity": 25,
+    "available_quantity": 5,
     "image_url": null
   },
   {

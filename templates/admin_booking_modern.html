@@ -48,7 +48,7 @@
                             </div>
                             <input type="tel" 
                                    id="customer_phone" 
-                                   name="customer_phone" 
+                                   name="contact_number" 
                                    required
                                    x-model="form.customer_phone"
                                    class="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
@@ -80,52 +80,52 @@
             <div class="space-y-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                     <i data-lucide="chef-hat" class="w-5 h-5 mr-2 text-orange-500"></i>
-                    Select Dish
+                    Select Dishes
                 </h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for dish in dishes %}
-                    <div class="glass dark:glass-dark rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                         :class="form.dish_id === '{{ dish.id }}' ? 'ring-2 ring-blue-500/50 bg-blue-50/50 dark:bg-blue-900/20' : ''"
-                         @click="selectDish({{ dish|tojson|safe }})">
-                        
-                        <!-- Dish Header -->
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ dish.name }}</h3>
-                            <div class="flex items-center space-x-2">
-                                <input type="radio" 
-                                       name="dish_id" 
-                                       value="{{ dish.id }}" 
-                                       x-model="form.dish_id"
-                                       class="text-blue-600 focus:ring-blue-500 h-4 w-4">
+                    <label class="relative group block dish-card glass dark:glass-dark rounded-2xl p-4 transition-all duration-300 cursor-pointer hover:scale-[1.03] hover:shadow-xl border-2 border-transparent hover:border-blue-400">
+                        <!-- Hidden Checkbox -->
+                        <input type="checkbox" name="dish_ids" value="{{ loop.index0 }}" id="dish_{{ loop.index0 }}"
+                               class="peer absolute opacity-0 w-0 h-0"
+                               onchange="toggleQuantityInput(this, {{ loop.index0 }})">
+                        <!-- Checkmark Overlay -->
+                        <span class="absolute top-3 right-3 z-10 hidden peer-checked:inline-block bg-green-500 text-white rounded-full p-1 shadow-lg">
+                            <i data-lucide='check' class="w-4 h-4"></i>
+                        </span>
+                        <!-- Dish Image or Placeholder -->
+                        {% if dish.image_url %}
+                            <img src="{{ dish.image_url }}" alt="{{ dish.dish_name }}" class="dish-image rounded-xl mb-3 w-full object-cover">
+                        {% else %}
+                            <div class="dish-placeholder-booking rounded-xl mb-3 flex items-center justify-center text-gray-400 text-3xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-700">
+                                <i data-lucide="image" class="w-10 h-10"></i>
                             </div>
-                        </div>
-                        
+                        {% endif %}
                         <!-- Dish Info -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600 dark:text-gray-400">Price</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">₹{{ dish.price }}</span>
-                            </div>
-                            
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600 dark:text-gray-400">Available</span>
-                                <span class="font-semibold" 
-                                      :class="'{{ dish.available_quantity }}' > 5 ? 'text-green-600 dark:text-green-400' : 
-                                             '{{ dish.available_quantity }}' > 0 ? 'text-yellow-600 dark:text-yellow-400' : 
-                                             'text-red-600 dark:text-red-400'">
-                                    {{ dish.available_quantity }} left
-                                </span>
-                            </div>
-                            
-                            <!-- Stock Level Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                {% set percentage = (dish.available_quantity / 50 * 100) %}
-                                <div class="h-2 rounded-full transition-all duration-300 {% if percentage > 40 %}bg-green-500{% elif percentage > 20 %}bg-yellow-500{% else %}bg-red-500{% endif %}" 
-                                     style="width: {{ [percentage, 100]|min }}%"></div>
-                            </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900 dark:text-white text-lg">{{ dish.dish_name }}</h3>
+                            <span class="text-base font-bold text-blue-500 dark:text-blue-400">₹{{ dish.price }}</span>
                         </div>
-                    </div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-600 dark:text-gray-400">Available</span>
+                            <span class="font-semibold {% if dish.available_quantity > 5 %}text-green-600 dark:text-green-400{% elif dish.available_quantity > 0 %}text-yellow-600 dark:text-yellow-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                                {{ dish.available_quantity }} left
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                            {% set percentage = (dish.available_quantity / 50 * 100) %}
+                            <div class="h-2 rounded-full transition-all duration-300 {% if percentage > 40 %}bg-green-500{% elif percentage > 20 %}bg-yellow-500{% else %}bg-red-500{% endif %}" 
+                                 style="width: {{ [percentage, 100]|min }}%"></div>
+                        </div>
+                        <!-- Quantity Input (only visible if checked) -->
+                        <div class="flex items-center mt-2">
+                            <label for="quantity_{{ loop.index0 }}" class="block text-xs text-gray-600 dark:text-gray-400 mr-2">Quantity</label>
+                            <input type="number" name="quantity_{{ loop.index0 }}" id="quantity_{{ loop.index0 }}"
+                                   min="1" max="{{ dish.available_quantity }}" value="1"
+                                   class="w-20 px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+                                   style="display:none;">
+                        </div>
+                    </label>
                     {% endfor %}
                 </div>
             </div>
@@ -137,14 +137,29 @@
                     Order Summary
                 </h2>
                 
+                <!-- Quantity Selection -->
+                <div class="mb-4">
+                    <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Quantity
+                    </label>
+                    <input type="number" 
+                           id="quantity" 
+                           name="quantity" 
+                           value="1" 
+                           min="1" 
+                           max="99"
+                           x-model="form.quantity"
+                           class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 transition-all duration-200">
+                </div>
+                
                 <div class="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="font-semibold text-gray-900 dark:text-white" x-text="selectedDish?.name || 'No dish selected'"></p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Quantity: 1</p>
+                            <p class="font-semibold text-gray-900 dark:text-white" x-text="selectedDish ? selectedDish.dish_name : 'No dish selected'"></p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Quantity: <span x-text="form.quantity || 1"></span></p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">₹<span x-text="selectedDish?.price || 0"></span></p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">₹<span x-text="selectedDish ? (selectedDish.price * (form.quantity || 1)) : 0"></span></p>
                             <p class="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
                         </div>
                     </div>
@@ -186,20 +201,77 @@
                 customer_name: '',
                 customer_phone: '',
                 customer_email: '',
-                dish_id: ''
+                dish_id: '',
+                quantity: 1
             },
             selectedDish: null,
             loading: false,
             
-            selectDish(dish) {
-                this.form.dish_id = dish.id.toString();
-                this.selectedDish = dish;
+            init() {
+                // Watch for changes in selectedDish and form
+                this.$watch('selectedDish', (value) => {
+                    console.log('selectedDish changed:', value);
+                });
+                
+                this.$watch('form.dish_id', (value) => {
+                    console.log('dish_id changed:', value);
+                });
+                
+                this.$watch('form.quantity', (value) => {
+                    console.log('quantity changed:', value);
+                });
+            },
+            
+            selectDish(index) {
+                console.log('Selecting dish:', index);
+                this.form.dish_id = index.toString();
+                
+                // Remove selection from all dishes
+                document.querySelectorAll('[data-dish-name]').forEach(el => {
+                    el.classList.remove('ring-2', 'ring-blue-500/50', 'bg-blue-50/50', 'dark:bg-blue-900/20');
+                });
+                
+                // Add selection to clicked dish
+                const clickedElement = event.currentTarget;
+                clickedElement.classList.add('ring-2', 'ring-blue-500/50', 'bg-blue-50/50', 'dark:bg-blue-900/20');
+                
+                // Get dish data from the clicked element's data attributes
+                this.selectedDish = {
+                    dish_name: clickedElement.dataset.dishName,
+                    price: parseFloat(clickedElement.dataset.dishPrice),
+                    description: clickedElement.dataset.dishDescription,
+                    available_quantity: parseInt(clickedElement.dataset.dishQuantity)
+                };
+                
+                console.log('Selected dish data:', this.selectedDish);
+                console.log('Form data:', this.form);
             },
             
             submitForm(event) {
                 this.loading = true;
+                
+                // Validate form
+                if (!this.form.customer_name || !this.form.customer_phone || !this.form.dish_id) {
+                    this.loading = false;
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
                 // Let the form submit naturally
+                console.log('Submitting booking form...');
+                console.log('Form data:', this.form);
+                
+                // The form will submit automatically since we're not preventing default
             }
+        }
+    }
+
+    function toggleQuantityInput(checkbox, index) {
+        var qtyInput = document.getElementById('quantity_' + index);
+        if (checkbox.checked) {
+            qtyInput.style.display = 'inline-block';
+        } else {
+            qtyInput.style.display = 'none';
         }
     }
 
